@@ -29,6 +29,10 @@
 			</ul>
 
 			<h3>Nova Transação</h3>
+			<div class="indicator" id="indicator">
+				<button class="debit" id="debit">Saída</button>
+				<button class="credit" id="credit">Entrada</button>
+			</div>
 			<form id="form">
 				<div class="form-control">
 					<label for="text">Descrição:</label>
@@ -36,7 +40,7 @@
 				</div>
 				<div class="form-control">
 					<label for="amount">Valor: (negativo - saída | positivo - entrada)</label>
-					<input type="number" id="amount" placeholder="Valor" />
+					<input type="float" id="amount" placeholder="Valor" />
 				</div>
 				<button class="btn">Adicionar</button>
 			</form>

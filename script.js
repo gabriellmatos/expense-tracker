@@ -5,31 +5,50 @@ const list = document.getElementById('list');
 const form = document.getElementById('form');
 const text = document.getElementById('text');
 const amount = document.getElementById('amount');
+const indicator = document.getElementById('indicator');
+const debit = document.getElementById('debit');
+const credit = document.getElementById('credit');
 
-const dummyTransactions = [
-	{ id: 1, text: 'Flower', amount: -20 },
-	{ id: 2, text: 'Salary', amount: 300 },
-	{ id: 3, text: 'Book', amount: -10 },
-	{ id: 4, text: 'Camera', amount: 150 },
-];
+// const dummyTransactions = [
+// 	{ id: 1, text: 'Flower', amount: -20 },
+// 	{ id: 2, text: 'Salary', amount: 300 },
+// 	{ id: 3, text: 'Book', amount: -10 },
+// 	{ id: 4, text: 'Camera', amount: 150 },
+// ];
 
-let transactions = dummyTransactions;
+// JSON.parse used because the content will be stringfied and we want to parse it into an array.
+const localStorageTransactions = JSON.parse(localStorage.getItem('transactions'));
+
+// Use Local Storage, otherwise just set the array to empty.
+let transactions = localStorage.getItem('transactions') !== null ? localStorageTransactions : [];
 
 // Add transaction to array
 function addTransaction(e) {
 	e.preventDefault();
 
-	if (text.value.trim() === '' || amount.value.trim() === '') {
-		alert('Por favor, adicione uma descrição e um valor.');
+	if (text.value.trim() === '' || amount.value.trim() === '' || Math.sign(amount.value) === -1) {
+		alert('Por favor, adicione uma descrição e um valor válido.');
 	} else {
+		const elementIndicator = indicator.querySelector('.selected');
+
+		let amountValue = amount.value;
+
+		if (elementIndicator.className == 'debit selected') {
+			amountValue = -1 * amount.value;
+		}
+
 		const transaction = {
 			id: generateID(),
 			text: text.value,
-			amount: +amount.value,
+			amount: +amountValue,
 		};
+
 		transactions.push(transaction);
+
 		addTransactionDOM(transaction);
 		updateValues();
+		updateLocalStorage();
+
 		text.value = '';
 		amount.value = '';
 	}
@@ -89,8 +108,13 @@ function init() {
 // Remove transaction by ID
 function removeTransaction(id) {
 	transactions = transactions.filter((transaction) => transaction.id !== id);
-
+	updateLocalStorage();
 	init();
+}
+
+// Update local storage transactions
+function updateLocalStorage() {
+	localStorage.setItem('transactions', JSON.stringify(transactions));
 }
 
 init();
@@ -98,3 +122,19 @@ init();
 // Event listener
 
 form.addEventListener('submit', addTransaction);
+
+// amount.addEventListener('keydown', (e) => {
+// 	if (!(e.key >= '0' && e.key <= 9) || !e.key === '.') {
+// 		amount.value = '';
+// 		alert('Apenas números e pontos permitidos.');
+// 	}
+// });
+
+debit.addEventListener('click', () => {
+	debit.classList.toggle('selected');
+	credit.classList.remove('selected');
+});
+credit.addEventListener('click', () => {
+	credit.classList.toggle('selected');
+	debit.classList.remove('selected');
+});
